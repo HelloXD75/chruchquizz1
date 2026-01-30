@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Church School Practice Test</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #121b2e;
+      --text: #e9eefc;
+      --muted: #aab6dd;
+      --accent: #7aa2ff;
+      --good: #41d18a;
+      --bad: #ff5c7a;
+      --line: rgba(255,255,255,0.08);
+      --shadow: 0 10px 30px rgba(0,0,0,0.35);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 20% 0%, rgba(122,162,255,0.25), transparent 60%),
+                  radial-gradient(900px 500px at 80% 10%, rgba(65,209,138,0.18), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 28px 16px 14px;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    h1 {
+      margin: 0 0 8px;
+      letter-spacing: 0.2px;
+      font-size: 28px;
+    }
+    .sub {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent 55%), var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .pill {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 13px;
+      background: rgba(255,255,255,0.03);
+    }
+    .pill b { color: var(--text); font-weight: 600; }
+
+    button {
+      border: 1px solid var(--line);
+      background: rgba(122,162,255,0.15);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:hover { background: rgba(122,162,255,0.22); }
+    button:active { transform: translateY(1px); }
+    .danger {
+      background: rgba(255,92,122,0.14);
+    }
+    .danger:hover { background: rgba(255,92,122,0.2); }
+
+    .qtitle {
+      margin: 0 0 10px;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+    .qmeta {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .choices {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    label.choice {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.02);
+      cursor: pointer;
+    }
+    label.choice:hover { background: rgba(255,255,255,0.05); }
+    input[type="radio"] { margin-top: 2px; }
+
+    textarea {
+      width: 100%;
+      min-height: 88px;
+      resize: vertical;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,0.25);
+      color: var(--text);
+      padding: 10px 12px;
+      outline: none;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .hr { height: 1px; background: var(--line); margin: 12px 0; }
+
+    .result {
+      display: grid;
+      gap: 10px;
+    }
+    .bigScore {
+      font-size: 34px;
+      font-weight: 800;
+      margin: 0;
+    }
+    .good { color: var(--good); }
+    .bad { color: var(--bad); }
+
+    details {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.02);
+    }
+    summary { cursor: pointer; font-weight: 700; }
+    .answerKey {
+      color: var(--muted);
+      margin: 10px 0 0;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .tiny {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Church School Practice Test</h1>
+    <p class="sub">
+      30 multiple-choice + 8 written questions (10 Commandments focused).<br>
+      Tip: Do the MCQ first, then written. Submit to see your score + answer key.
+    </p>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="row">
+        <div class="pill">Questions: <b id="count"></b></div>
+        <div class="pill">MCQ: <b id="mcqCount"></b> · Written: <b id="wrCount"></b></div>
+        <div class="row" style="gap:10px;">
+          <button id="shuffleBtn" title="Shuffle question order">Shuffle</button>
+          <button class="danger" id="resetBtn" title="Clear all answers">Reset</button>
+          <button id="submitBtn" title="Grade the multiple-choice and show answer key">Submit</button>
+        </div>
+      </div>
+      <div class="hr"></div>
+      <p class="tiny">
+        Written questions: this site shows model answers so you can self-check (teachers grade those by meaning, not perfect wording).
+      </p>
+    </section>
+
+    <section id="quiz"></section>
+
+    <section id="results" class="card" style="display:none;"></section>
+  </main>
+
+  <script>
+    // ---------- DATA ----------
+    // 10 Commandments (simple meaning wording)
+    const commandments = [
+      "You shall have no other gods before Me.",
+      "You shall not make or worship idols (graven images).",
+      "You shall not take the Lord’s name in vain.",
+      "Remember the Sabbath day, to keep it holy.",
+      "Honor your father and your mother.",
+      "You shall not murder (kill).",
+      "You shall not commit adultery.",
+      "You shall not steal.",
+      "You shall not bear false witness (lie).",
+      "You shall not covet (want what belongs to others)."
+    ];
+
+    // 30 multiple choice questions
+    // Correct option is index "a" (0-3).
+    const mcq = [
+      { q: "Which commandment means you should worship only God?", c: ["No other gods", "Do not steal", "Honor your parents", "Do not lie"], a: 0 },
+      { q: "Which commandment is about idols (graven images)?", c: ["Keep the Sabbath holy", "Do not make/worship idols", "Do not murder", "Do not covet"], a: 1 },
+      { q: "“Do not take the Lord’s name in vain” means:", c: ["Never say God’s name ever", "Use God’s name with respect (don’t use it as a joke or curse)", "Only pray on Sundays", "Don’t read the Bible"], a: 1 },
+      { q: "Which commandment is about a day of rest and worship?", c: ["Remember the Sabbath day", "Do not steal", "Do not commit adultery", "No idols"], a: 0 },
+      { q: "Which commandment is about respecting parents/guardians?", c: ["Do not bear false witness", "Honor your father and mother", "No other gods", "Do not covet"], a: 1 },
+      { q: "Which commandment is about protecting human life?", c: ["Do not murder", "Do not steal", "Keep the Sabbath", "No idols"], a: 0 },
+      { q: "Which commandment is about faithfulness in marriage?", c: ["Do not commit adultery", "Do not lie", "Honor parents", "No other gods"], a: 0 },
+      { q: "Which commandment is about taking what isn’t yours?", c: ["Do not steal", "Do not covet", "Do not murder", "Keep Sabbath"], a: 0 },
+      { q: "Which commandment is about telling the truth in court or about others?", c: ["Do not take God’s name in vain", "Do not bear false witness", "No other gods", "Honor parents"], a: 1 },
+      { q: "Which commandment means don’t be jealous of someone else’s stuff?", c: ["Do not steal", "Do not covet", "Keep the Sabbath", "No idols"], a: 1 },
+
+      // order-based
+      { q: "What is the 5th commandment?", c: ["Honor your father and mother", "Do not steal", "No other gods", "Do not commit adultery"], a: 0 },
+      { q: "What is the 8th commandment?", c: ["Do not lie", "Do not steal", "Do not murder", "Keep the Sabbath"], a: 1 },
+      { q: "What is the 10th commandment?", c: ["Do not covet", "Do not steal", "No idols", "Honor parents"], a: 0 },
+      { q: "What is the 2nd commandment?", c: ["No idols", "No other gods", "Do not murder", "Keep the Sabbath"], a: 0 },
+      { q: "What is the 3rd commandment?", c: ["Do not commit adultery", "Do not take the Lord’s name in vain", "Honor parents", "Do not steal"], a: 1 },
+
+      // meaning / application
+      { q: "If someone lies about a classmate to get them in trouble, that breaks:", c: ["Do not steal", "Do not bear false witness", "Keep the Sabbath", "No idols"], a: 1 },
+      { q: "If someone wants a friend’s phone so badly they feel bitter and jealous, that’s closest to:", c: ["Stealing", "Coveting", "Adultery", "Taking God’s name in vain"], a: 1 },
+      { q: "Which pair is MOST correct for commandments 6 and 7?", c: ["6: Steal, 7: Lie", "6: Murder, 7: Adultery", "6: Covet, 7: Steal", "6: Sabbath, 7: Parents"], a: 1 },
+      { q: "Calling on God’s name as a joke or insult breaks:", c: ["Commandment 2", "Commandment 3", "Commandment 4", "Commandment 10"], a: 1 },
+      { q: "Putting money, popularity, or a celebrity above God is closest to breaking:", c: ["No other gods", "Do not murder", "Honor parents", "Keep Sabbath"], a: 0 },
+
+      // more order/recognition
+      { q: "Which commandment comes right AFTER 'Remember the Sabbath day'?", c: ["No idols", "Honor your father and mother", "Do not steal", "Do not covet"], a: 1 },
+      { q: "Which commandment comes right BEFORE 'Do not steal'?", c: ["Do not commit adultery", "Do not murder", "Honor parents", "Do not covet"], a: 0 },
+      { q: "Which commandment comes right BEFORE 'Do not covet'?", c: ["Do not steal", "Do not bear false witness", "Do not commit adultery", "Honor parents"], a: 1 },
+
+      // “which one is NOT”
+      { q: "Which one is NOT one of the Ten Commandments?", c: ["Do not steal", "Be kind to everyone", "Keep the Sabbath holy", "Do not covet"], a: 1 },
+      { q: "Which one is NOT mainly about how we treat people?", c: ["Honor your father and mother", "Do not steal", "Remember the Sabbath day", "Do not bear false witness"], a: 2 },
+
+      // broader “theme” questions teachers like
+      { q: "The first 4 commandments mainly focus on:", c: ["Sports rules", "Relationship with God", "How to build a house", "How to get rich"], a: 1 },
+      { q: "The last 6 commandments mainly focus on:", c: ["How to treat others", "How to cook", "How to drive", "How to win games"], a: 0 },
+
+      // quick trick-ish questions
+      { q: "‘Covet’ MOST closely means:", c: ["To sleep", "To strongly want what someone else has", "To forgive", "To travel"], a: 1 },
+      { q: "‘Sabbath’ MOST closely means:", c: ["A day set apart for rest and worship", "A type of food", "A money system", "A holiday only for kids"], a: 0 },
+      { q: "An ‘idol’ in the commandments is BEST described as:", c: ["A pet", "Anything you worship instead of God", "A school rule", "A family member"], a: 1 }
+    ];
+
+    // Written questions (self-check)
+    const written = [
+      {
+        q: "Write the 10 Commandments in order (short wording is fine).",
+        model: commandments.map((x, i) => `${i+1}. ${x}`).join("\n")
+      },
+      {
+        q: "In 2–3 sentences: What does ‘Do not covet’ mean in everyday life?",
+        model: "It means don’t be jealous or obsessed with what someone else has. Instead of letting envy control you, be thankful and choose the right actions."
+      },
+      {
+        q: "In 2–3 sentences: What does ‘Keep the Sabbath holy’ mean?",
+        model: "It means set aside a day for rest and worship. The idea is to focus on God, take a break from regular work, and keep the day special."
+      },
+      {
+        q: "Give one example of breaking ‘Do not bear false witness’ and one example of obeying it.",
+        model: "Breaking: lying about someone to get them in trouble. Obeying: telling the truth, especially when it’s hard, and not spreading rumors."
+      },
+      {
+        q: "Explain why ‘Honor your father and mother’ matters (2–3 sentences).",
+        model: "It teaches respect for parents/guardians and authority. Honoring them can include listening, speaking respectfully, and doing your responsibilities."
+      },
+      {
+        q: "Pick ONE commandment and explain the lesson it teaches (2–4 sentences).",
+        model: "Example: ‘Do not steal’ teaches honesty and respect for others’ property. It reminds us to be fair, work for what we have, and not take advantage of others."
+      },
+      {
+        q: "List commandments 1–4 (God-focused) in your own words.",
+        model: "1) Worship only God. 2) Don’t worship idols. 3) Respect God’s name. 4) Keep the Sabbath day holy."
+      },
+      {
+        q: "List commandments 5–10 (people-focused) in your own words.",
+        model: "5) Respect your parents. 6) Don’t murder. 7) Don’t commit adultery. 8) Don’t steal. 9) Don’t lie about others. 10) Don’t covet."
+      }
+    ];
+
+    // ---------- STATE ----------
+    let order = [];              // combined order of questions
+    let answers = {};            // user answers for MCQ
+    let writtenAnswers = {};     // user text for written
+
+    // ---------- HELPERS ----------
+    function shuffleArray(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function escapeHTML(str) {
+      return str.replaceAll("&","&amp;")
+                .replaceAll("<","&lt;")
+                .replaceAll(">","&gt;")
+                .replaceAll('"',"&quot;")
+                .replaceAll("'","&#039;");
+    }
+
+    function makeOrder() {
+      // Put MCQ first, written after (teacher-style)
+      const mcqItems = mcq.map((_, i) => ({ type: "mcq", idx: i }));
+      const wrItems  = written.map((_, i) => ({ type: "wr", idx: i }));
+      order = mcqItems.concat(wrItems);
+    }
+
+    function render() {
+      const quizEl = document.getElementById("quiz");
+      quizEl.innerHTML = "";
+
+      document.getElementById("count").textContent = order.length;
+      document.getElementById("mcqCount").textContent = mcq.length;
+      document.getElementById("wrCount").textContent = written.length;
+
+      order.forEach((item, n) => {
+        const card = document.createElement("section");
+        card.className = "card";
+
+        const number = n + 1;
+
+        if (item.type === "mcq") {
+          const q = mcq[item.idx];
+
+          card.innerHTML = `
+            <p class="qmeta">Question ${number} · Multiple choice</p>
+            <p class="qtitle">${escapeHTML(q.q)}</p>
+            <div class="choices" role="group" aria-label="choices"></div>
+          `;
+
+          const choicesEl = card.querySelector(".choices");
+
+          q.c.forEach((choiceText, i) => {
+            const id = `q_${item.type}_${item.idx}_${i}`;
+            const checked = (answers[item.idx] === i) ? "checked" : "";
+            const label = document.createElement("label");
+            label.className = "choice";
+            label.setAttribute("for", id);
+            label.innerHTML = `
+              <input type="radio" name="mcq_${item.idx}" id="${id}" value="${i}" ${checked} />
+              <div>${escapeHTML(choiceText)}</div>
+            `;
+            label.querySelector("input").addEventListener("change", (e) => {
+              answers[item.idx] = parseInt(e.target.value, 10);
+            });
+            choicesEl.appendChild(label);
+          });
+
+        } else {
+          const w = written[item.idx];
+          const existing = writtenAnswers[item.idx] ?? "";
+
+          card.innerHTML = `
+            <p class="qmeta">Question ${number} · Written</p>
+            <p class="qtitle">${escapeHTML(w.q)}</p>
+            <textarea placeholder="Type your answer here...">${escapeHTML(existing)}</textarea>
+            <div class="tiny" style="margin-top:8px;">
+              Tip: Short, clear meaning is usually enough.
+            </div>
+          `;
+
+          const ta = card.querySelector("textarea");
+          ta.addEventListener("input", (e) => {
+            writtenAnswers[item.idx] = e.target.value;
+          });
+        }
+
+        quizEl.appendChild(card);
+      });
+
+      // Hide results if re-rendering
+      document.getElementById("results").style.display = "none";
+    }
+
+    function grade() {
+      let correct = 0;
+      let answered = 0;
+
+      const details = [];
+
+      mcq.forEach((q, idx) => {
+        const user = answers[idx];
+        const isAnswered = (user !== undefined);
+        if (isAnswered) answered++;
+
+        const ok = (user === q.a);
+        if (ok) correct++;
+
+        details.push({
+          idx,
+          question: q.q,
+          user,
+          correct: q.a,
+          ok,
+          choices: q.c
+        });
+      });
+
+      return { correct, answered, total: mcq.length, details };
+    }
+
+    function showResults() {
+      const r = grade();
+      const pct = Math.round((r.correct / r.total) * 100);
+
+      const resultsEl = document.getElementById("results");
+      resultsEl.style.display = "block";
+
+      const toneClass = pct >= 80 ? "good" : (pct >= 60 ? "" : "bad");
+
+      resultsEl.innerHTML = `
+        <div class="result">
+          <p class="qmeta">Results</p>
+          <p class="bigScore ${toneClass}">${r.correct}/${r.total} MCQ correct (${pct}%)</p>
+          <p class="sub">You answered <b>${r.answered}</b> out of <b>${r.total}</b> multiple-choice questions.</p>
+
+          <div class="hr"></div>
+
+          <details>
+            <summary>Multiple Choice Answer Key (with your answers)</summary>
+            <div class="answerKey" id="mcqKey"></div>
+          </details>
+
+          <details>
+            <summary>Written Questions: Model Answers (self-check)</summary>
+            <div class="answerKey" id="wrKey"></div>
+          </details>
+        </div>
+      `;
+
+      // Build MCQ key
+      const mcqKey = resultsEl.querySelector("#mcqKey");
+      const lines = r.details.map((d) => {
+        const userText = (d.user === undefined) ? "— (no answer)" : `"${d.choices[d.user]}"`;
+        const correctText = `"${d.choices[d.correct]}"`;
+        const mark = d.ok ? "✅" : "❌";
+        return `${mark} Q${d.idx + 1}: ${d.question}
+  Your answer: ${userText}
+  Correct:     ${correctText}`;
+      });
+      mcqKey.textContent = lines.join("\n\n");
+
+      // Build written model answers
+      const wrKey = resultsEl.querySelector("#wrKey");
+      const wrLines = written.map((w, i) => {
+        const yours = (writtenAnswers[i] ?? "").trim();
+        return `Q${mcq.length + i + 1}: ${w.q}
+Your answer:
+${yours ? yours : "— (no answer)"}
+
+Model answer:
+${w.model}`;
+      });
+      wrKey.textContent = wrLines.join("\n\n------------------------------\n\n");
+
+      // Scroll to results
+      resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function resetAll() {
+      answers = {};
+      writtenAnswers = {};
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // ---------- INIT ----------
+    makeOrder();
+    render();
+
+    // Buttons
+    document.getElementById("shuffleBtn").addEventListener("click", () => {
+      // Shuffle within MCQ block and within written block (keeps structure)
+      const mcqItems = order.filter(x => x.type === "mcq");
+      const wrItems  = order.filter(x => x.type === "wr");
+      const shuffled = shuffleArray(mcqItems).concat(shuffleArray(wrItems));
+      order = shuffled;
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", resetAll);
+    document.getElementById("submitBtn").addEventListener("click", showResults);
+  </script>
+</body>
+</html>
